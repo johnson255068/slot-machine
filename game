@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>日式老虎角子機</title>
+  <style>
+    body {
+      background: #222;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    .reels {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+    .reel {
+      font-size: 50px;
+      width: 80px;
+      height: 80px;
+      margin: 0 10px;
+      background: #444;
+      border-radius: 10px;
+      line-height: 80px;
+      border: 3px solid white;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #result {
+      font-size: 24px;
+      margin-top: 20px;
+      color: gold;
+    }
+    #score {
+      margin-top: 10px;
+      font-size: 20px;
+      color: lightgreen;
+    }
+  </style>
+</head>
+<body>
+
+<h1>日式拉霸機 🎰</h1>
+
+<div class="reels">
+  <div class="reel" id="reel1">🍒</div>
+  <div class="reel" id="reel2">🍒</div>
+  <div class="reel" id="reel3">🍒</div>
+</div>
+
+<div>
+  <button onclick="startGame()">開始遊戲</button><br>
+  <button onclick="stopReel(0)">停止1</button>
+  <button onclick="stopReel(1)">停止2</button>
+  <button onclick="stopReel(2)">停止3</button>
+</div>
+
+<div id="result"></div>
+<div id="score">分數：0</div>
+
+<audio id="spinSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3c49fdcd00.mp3?filename=arcade-game-jump-146913.mp3"></audio>
+<audio id="winSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_285b47db06.mp3?filename=success-1-6297.mp3"></audio>
+<audio id="failSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_17bc2285d2.mp3?filename=error-2-126514.mp3"></audio>
+
+<script>
+  const symbols = ['🍒', '🍋', '🔔', '💎', '7️⃣', '🍀'];
+  const reels = [null, null, null];
+  const reelElements = [
+    document.getElementById('reel1'),
+    document.getElementById('reel2'),
+    document.getElementById('reel3')
+  ];
+
+  const spinSound = document.getElementById('spinSound');
+  const winSound = document.getElementById('winSound');
+  const failSound = document.getElementById('failSound');
+
+  let score = 0;
+
+  function startGame() {
+    document.getElementById('result').textContent = '';
+    for (let i = 0; i < 3; i++) {
+      startReel(i);
+    }
+    spinSound.currentTime = 0;
+    spinSound.play();
+  }
+
+  function startReel(index) {
+    if (reels[index]) clearInterval(reels[index]);
+    reels[index] = setInterval(() => {
+      const symbol = symbols[Math.floor(Math.random() * symbols.length)];
+      reelElements[index].textContent = symbol;
+    }, 100);
+  }
+
+  function stopReel(index) {
+    if (reels[index]) {
+      clearInterval(reels[index]);
+      reels[index] = null;
+      if (reels.every(r => r === null)) {
+        checkResult();
+      }
+    }
+  }
+
+  function checkResult() {
+    const [s1, s2, s3] = reelElements.map(e => e.textContent);
+    const resultText = document.getElementById('result');
+    if (s1 === s2 && s2 === s3) {
+      resultText.textContent = '🎉 恭喜中獎！';
+      score += 100;
+      winSound.play();
+    } else {
+      resultText.textContent = '再接再厲！';
+      score = Math.max(0, score - 10);
+      failSound.play();
+    }
+    document.getElementById('score').textContent = '分數：' + score;
+  }
+</script>
+
+</body>
+</html>
